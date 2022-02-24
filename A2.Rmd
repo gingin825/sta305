@@ -1,0 +1,263 @@
+---
+title: "Comparing Expected Lifetime of LED Bulbs under Temperature S and Temperature T"
+subtitle: "STA 305 Assignment 2"
+author: "Yu-Chun Chien"
+date: "2/14/2021"
+output: pdf_document
+---
+
+# Part I
+
+## Treatment S
+Generate 9 observations from exp($\lambda = \frac{1}{3}$) to correspond to treatment S.
+
+```{r}
+set.seed(1005194380)
+rexp(9, rate=1/3)
+```
+Observed values in the order they appeared: 1.340, 4.024, 1.436, 3.568, 8.344, 3.833, 2.975, 3.406, 2.715
+
+## Treatment T
+Generate 9 observations from exp($\lambda = 1$) to correspond to treatment T.
+
+```{r}
+set.seed(1005194380)
+rexp(9, rate=1)
+```
+
+Observed values in the order they appeared: 0.447, 1.341, 0.479, 1.189, 2.781, 1.278, 0.992, 1.135, 0.905
+
+## Pairs of Observations of Treatment S and T
+
+```{r}
+treat_s_yc <- c(1.340, 4.024, 1.436, 3.568, 8.344, 3.833, 2.975, 3.406, 2.715)
+treat_t_yc <- c(0.447, 1.341, 0.479, 1.189, 2.781, 1.278, 0.992, 1.135, 0.905)
+pair_no_yc <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+random_pair_yc <- data.frame(pair_no_yc, treat_s_yc, treat_t_yc)
+random_pair_yc
+```
+
+# Part II
+
+## Completely Randomized Design
+
+### Randomization Distribution 
+
+```{r, warning=F}
+# pool data
+pair_yc <- c(treat_s_yc, treat_t_yc)
+N_yc <- choose(18, 9)
+diff_yc <- numeric(N_yc)
+
+library(combinat)
+index_yc <- combn(1:18,9)
+
+for (i in 1:N_yc){
+  diff_yc[i] <- mean(pair_yc[index_yc[,i]]) - mean(pair_yc[-index_yc[,i]])
+}
+```
+
+Number of Values this Distribution Contains: 48620
+
+Probability of the Observed Treatment Allocation: $\frac{1}{48620}$
+
+### Histogram of the Randomized Distribution
+
+```{r}
+hist(diff_yc, xlab= "|meanS-meanT|", main = "Randomization Distribution CRD 4380")
+
+observe_yc <- mean(treat_s_yc) - mean(treat_t_yc)
+
+abline(v=observe_yc, col="blue")
+abline(v=-(observe_yc), col="blue")
+text(2.2, 8600, "2.34", col = "blue")
+text(-2.1, 8600, "-2.34", col = "blue")
+```
+
+### Randomization Test
+
+$H_0: \mu_s = \mu_t$
+$H_A: \mu_s \neq \mu_t$
+
+```{r}
+# p-value
+tbar_yc <- mean(diff_yc)
+
+p_yc <- sum(abs(diff_yc - tbar_yc)>=abs(observe_yc - tbar_yc))/N_yc
+round(p_yc, 2)
+```
+
+The p-value is 0. According to the randomization test, assume there is no difference in life expectency of the bulbs between temperature S and temperature T, approximately 0% of randomizations would produce an extreme or more extreme difference than the observed mean differenence $|2.34|$ (probability = the area to the right of 2.34 and to the left of -2.34 in the histogram). Thus, the result of the randomization test indicates that it is quite unlikely that light bulbs will have the same life expectancy under temperature S and T.
+
+## Randomized Paired Design
+
+### Randomization Distribution
+
+Number of Values this distribution contains: $2^9=512$
+
+Probability of the observed treatment allocation: $\frac{1}{512}$
+
+### Histogram of Randomization Distribution
+
+
+```{r}
+diffp_yc <- treat_s_yc - treat_t_yc
+mean_diffp_yc <- mean(diffp_yc)
+
+Np_yc <- 2^(9)
+nump_yc <- numeric(Np_yc)
+mult_yc <- list(c(-1,1))
+assign_yc <- expand.grid(rep(mult_yc, 9))
+
+for (i in 1 : Np_yc){
+  nump_yc[i] <- mean(as.numeric(assign_yc[i,] * diffp_yc))
+}
+```
+
+```{r}
+# histogram
+hist(nump_yc, xlab = "Mean Difference", main = "Randomization Distribution Randomized Paired 4080")
+abline(v = mean_diffp_yc, col="blue")
+abline(v = -(mean_diffp_yc), col="blue")
+text(2.15, 97, "2.34", col = "blue")
+text(-2.1, 97, "-2.34", col = "blue")
+```
+
+### Randomization Test
+
+$H_0: \mu_s = \mu_t$
+$H_A: \mu_s \neq \mu_t$
+
+```{r}
+# p-value
+tbarp_yc <- mean(nump_yc)
+
+p_val_yc <- sum(abs(nump_yc - tbarp_yc)>=abs(mean_diffp_yc - tbarp_yc))/Np_yc
+round(p_val_yc, 2)
+```
+
+The p-value is 0. According to the randomization test, assume there is no difference in life expectency of the bulbs between temperature S and temperature T, approximately 0% of randomizations would produce an extreme or more extreme difference than the observed mean differenence $|2.34|$ (probability = the area to the right of 2.34 and to the left of -2.34 in the histogram). The result of the randomization test indicates that it is quite unlikely that light bulbs will have the same life expectancy under temperature S and T.
+
+# Part III
+
+## Two-Sample T-test for Completely Randomized Design
+
+```{r}
+t.test(treat_s_yc, treat_t_yc, var.equal = F, alternative = "two.sided")
+```
+p-value of completely randomized design: 0
+
+According to the two-sample t-test, the probability that the mean of the two measurements is equal is 0. Using a benchmark significance level of 5%, it is quite unlikely that the mean of the two measurements is equal. Instead, the mean of the expected lifetime under temperature S is larger than the mean of the expected lifetime under temperature T.
+
+## Paired T-test for Randomized Paired Design
+
+```{r}
+t.test(treat_s_yc, treat_t_yc, paired = T, alternative = "two.sided")
+```
+p-value of randomized paired design: 0
+
+According to the paired t-test, the probability that the mean of the paired differences is zero is approximately 0. Using a benchmark significance level of 5%, it is quite unlikely that the mean of the paired difference is zero. Instead, the mean of the difference is greater than zero; on average, the expected lifetime under temperature S is larger than the expected lifetime under temperature T. 
+
+## Assumption behind T-test
+
+The assumption of independence is satisfied while the assumption of normality is not satisfied 
+
+(1) The two samples (treatment S and T) are sampled individually without influencing each other, which makes them independent of each other.
+
+(2) The two samples are not normally distributed. According to the Normal QQ plots, the two samples are right-skewed and do not follow a normal distribution.
+```{r}
+# normality
+par(mfrow=c(1,2))
+qqnorm(treat_s_yc, main = "Normal Q-Q Plot Treatment S")
+qqline(treat_s_yc)
+qqnorm(treat_t_yc, main = "Normal Q-Q Plot Treatment T")
+qqline(treat_t_yc)
+```
+
+### Result of T-test vs. Randomization Test
+
+Yes, the results of the t-test agree with the results of the randomization test. Both tests have p-value that is equal to zero, which suggested that there is a difference in the light bulb life expectancy under temperature S and temperature T. 
+
+# Part IV
+
+## Power of Completely Randomized Design and T-test
+
+```{r}
+set.seed(1005194380)
+
+pvals_yc <- replicate(1000, t.test(rexp(20, 1/3), rexp(20, 1), var.equal = F, alternative = "two.sided")$p.value)
+
+sum(pvals_yc <= 0.05)/1000
+
+```
+
+Power: 0.86
+
+## Randomized Paired Design and T-test
+
+```{r}
+set.seed(1005194380)
+
+ppair_yc <- replicate(1000, t.test(rexp(20, 1/3), rexp(20, 1), paired = T, alternative = "two.sided")$p.value)
+
+sum(ppair_yc <= 0.05)/1000
+```
+
+Power: 0.85
+
+## Completely Randomized Design and Wilcoxon Test
+
+```{r}
+set.seed(1005194380)
+
+wil_crd_yc <- replicate(1000, wilcox.test(rexp(20, 1/3), rexp(20, 1), alternative = "two.sided")$p.value)
+
+sum(wil_crd_yc <= 0.05)/1000
+```
+
+Power: 0.80
+
+## Randomized Paired Design and Wilcoxon Test
+
+```{r}
+set.seed(1005194380)
+
+wil_paired_yc <- replicate(1000, wilcox.test(rexp(20, 1/3), rexp(20, 1), paired = T, alternative = "two.sided")$p.value)
+
+sum(wil_paired_yc <= 0.05)/1000
+```
+
+Power: 0.83
+
+## Comparison of Power 
+
+Power that is larger than 0.80 is desirable. Here, the comparison of power is as follows:
+
+Completely Randomized Design and T-test (0.86) > Randomized Paired Design and T-test (0.85) > Randomized Paired Design and Wilcoxon Test (0.83) > Completely Randomized Design and Wilcoxon Test (0.80)
+
+## Checking for Normality
+
+```{r}
+set.seed(1005194380)
+
+# treatment S
+qqnorm(rexp(20, 1/3), main = "Normal Q-Q Plot Treatment S")
+qqline(rexp(20, 1/3))
+
+# treatment T
+qqnorm(rexp(20, 1), main = "Normal Q-Q Plot Treatment T")
+qqline(rexp(20, 1))
+
+# treatment S + T
+combine_yc <- c(rexp(20, 1/3), rexp(20, 1))
+qqnorm(combine_yc, main = "Normal Q-Q Plot Treatment S + T")
+qqline(combine_yc)
+```
+
+### Statistical Test for Completely Randomized Design
+
+For the completely randomized design, we need both samples (treatment S and treatment T) to follow a normal distribution for carrying out the two-sample t-test. However, the normal QQ plot suggested that although the 20 samples of treatment S follow a normal distribution, the 20 samples of treatment T does not follow a normal distribution. Thus, the Mann-Whitney Test would be more suitable for the completely randomized design.
+
+### Statistical Test for the Randomized Paired Design
+
+For the randomized paired design, we need the combined dataset (20 samples of treatment S and 20 samples of treatment T) to follow a normal distribution for carrying out the paired t-test. However, according to the normal QQ plot, the combined dataset does not follow a normal distribution. Therfore, paired t-test is not applicable here and we should instead conduct a Mann-Whitney Test.

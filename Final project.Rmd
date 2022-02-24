@@ -1,0 +1,429 @@
+---
+title: "The Best Way to Make Boiled Eggs Easy to Peel"
+author: "Yu-Chun Chien"
+date: "4/16/2021"
+output:
+  pdf_document: default
+---
+
+```{r, include=F, echo = FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(dbplyr)
+#install.packages("FrF2")
+library("FrF2")
+
+```
+# I. Description
+
+## Objectives
+
+|     I live in Toronto away from my family and have to cook my own meals. Having many things going on, I always like to make my meal simple and fast while trying my best to eat healthily. As a lean and convenient source of protein, eggs are one of the best foods to incorporate in every meal. Although cooking hard-boiled eggs are the most time-saving way to cook eggs, I often have a hard time peeling the eggs fastly and the eggs often stick with the shell. One time when I was tired of peeling the eggs, I started to search for ways to cook the hard-boiled eggs for making them easy to peel. Some of the ways include adding vinegar while boiling, using one week-old eggs instead of fresh eggs, and letting the eggs cool down in ice water for a while after boiling. However, I always forgot to follow those ways and often times still struggle with peeling the eggs. Thus, I would like to conduct an experiment and try all of the conditions suggested on the internet. 
+
+|     I hypothesized that adding vinegar to the water makes the peeling time shorter since the vinegar helps with breaking down the shell while boiling. In addition, I hypothesized that boiling a week-old egg instead of fresh eggs makes the peeling time shorter since the pH of the fresh egg white is lower which causes it to stick to the shell. Also, I hypothesized that cooling down the eggs in iced water after boiling shortens the peeling time, as the ice water “shocks” the membrane between the egg white and the shell which loosens the shell. Also, although no online articles focus on the interaction effects between more than one factors, I would like to observe whether there are 2-factors interaction or 3-factors interaction. Finally, I hypothesized that the optimal condition is when vinegar is added when boiling, when eggs are cooled in iced water, and when eggs are one week old. 
+
+## Method
+
+### Experimental Design & Units
+
+|     The experiment is going to be a factorial experiment with 3 factors and 2 levels for each factor ($2^3$ factorial experiment). The three factors are whether or not vinegar is added when boiling, whether the egg is fresh or is a week old, and whether or not it is cooled down in iced water for five minutes after cooking. The response variable is the peeling time of the eggs in seconds. To ensure the peeling speed is only affected by the three factors, I will use the same peeling method when peeling all eggs. Specifically, I will first crack the middle of the egg and then peel the egg from there.  
+
+The three conditions are coded as follows:
+
+(1) Vinegar: With (2 tablespoons for 2 eggs) and without. These are coded as 1 and -1 respectively.
+
+(2) Ice: With (40 ice cubes for 4 eggs) and without. These are coded as 1 and -1 respectively.
+
+(3) Age: 1 week old and 1 fresh. These are coded as 1 and -1 respectively.
+
+|     The experimental units include 16 eggs that were bought from the supermarket on the same day to ensure they have the same freshness, meaning that each condition is replicated 2 times. Other experimental materials used includes white vinegar (4 table spoons in total), ice cubes (80 in total), cooking utensils (2 identical pots), bowls to cool down the eggs after boiling (4 in total), and stop watch (Clock App in iphone).
+
+### Procedure
+
+|     The experiment will be conducted with the following procedures: 
+
+(1) After buying 16 eggs from the supermarket, put 8 in the storage (to store the one-week-old eggs) and boil the other 8 eggs in two separate pots (identical, with the same texture and size).
+
+(2) Within the 2 pots, add room temperature water to both pots and add 2 tablespoon of vinegar to one pot.
+
+```{r, include=F, echo = FALSE, warning=FALSE, message=FALSE}
+# ![Two identical pots. One with four eggs, two table spoons of vinegar, and room temperature water. The other one with room temperature water.](/Users/gingin/Desktop/sta305/IMG_2743.png)
+```
+
+(3) At the same time, prepare two bowl of iced water by putting 20 ice cubes in each bowl into room temperature water. Also, prepare another two empty bowl. 
+
+```{r, include=F, echo = FALSE, warning=FALSE, message=FALSE}
+# ![Prepare 4 bowls for cooling down the eggs in room temperature and in iced-water.](/Users/gingin/Desktop/sta305/IMG_2745.png)
+```
+
+(4) Put the two pots on the stove and start to heat the pots with eggs. 
+
+```{r, include=F, echo = FALSE, warning=FALSE, message=FALSE}
+#![One-Minute Since Boiling of the Eggs.](/Users/gingin/Desktop/sta305/IMG_2685.png)
+
+#![Ten-Minutes Since Boiling of the Eggs.](/Users/gingin/Desktop/sta305/IMG_2687.png)
+```
+
+(5) After 15 minutes, take all eggs out of the pot, and put two eggs from the vinegar pot and two eggs from the water pot into the iced water for 5 minutes. The remaining eggs will stay at room temperature for 5 minutes. 
+
+```{r, include=F, echo = FALSE, warning=FALSE, message=FALSE}
+#![Cooling the eggs after 15 minuter of boiling for 5 minutes.](/Users/gingin/Desktop/sta305/IMG_2746.png)
+```
+
+
+(6) Finally, after 5 minutes, peel all the eggs and measure the time taken to peel each egg in seconds using the same stopwatch. 
+
+```{r, include=F, echo = FALSE, warning=FALSE, message=FALSE}
+# ![That is it. I used the Clock App in iphone as a timer when I peel the eggs.](/Users/gingin/Desktop/sta305/IMG_2749.png)
+```
+
+(7) For the remaining 8 eggs, wait until a week passed and repeat the exact procedures mentioned above. 
+
+\newpage
+
+# II. Data Analysis
+
+## Data Value Recorded
+
+(Note that each value of the dependent variable "peeling time" is the average over two duplicated runs.)
+
+
+```{r, include=T, echo = FALSE, warning=FALSE, message=FALSE}
+# make a table for data
+Vinegar <- c(-1, -1, 1, 1, -1, -1, 1, 1)
+Ice <- c(-1, 1, -1, 1, -1, 1, -1, 1)
+Age <- c(-1, -1, -1, -1, 1, 1, 1, 1)
+y1 <- c(36.20, 30.46, 45.23, 23.62, 17.26, 24.45, 22.92, 16.66)
+y2 <- c(30.92, 29.61, 28.40, 13.80, 21.91, 26.43, 22.36, 20.90)
+Peeling_Time <- 0
+for(i in 1:8){
+  Peeling_Time[i] <- (y1[i] + y2[i])/2
+}
+
+table = cbind(Vinegar, Ice, Age, Peeling_Time)
+colnames(table)=c("Vinegar","Ice","Age", "Peeling Time")
+table
+```
+
+## Main Effects & Interaction Effects
+
+### Cube Plot
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+# cube plot
+raw_data <- data.frame(Vinegar, Ice, Age, Peeling_Time)
+cube_lm <- lm(Peeling_Time~Vinegar*Ice*Age, data=raw_data)
+
+cubePlot(cube_lm, "Vinegar", "Ice", "Age", main = "Cube Plot for Peeling Time Investigation")
+```
+
+### Main Effects
+
+#### Effect of Adding Vinegar
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+((36.815-33.56) + (22.64-19.585) + (18.78-25.44) + (18.71-30.035))/4
+```
+The main effect of Vinegar is $$V = \frac{(36.815-33.56) + (22.64-19.585) + (18.78-25.44) + (18.71-30.035)}{4} =  -2.91875$$
+
+|     On average, adding vinegar into the water when boiling the eggs makes the peeling time shorter, and the time difference is approximately 2.92 seconds. 
+
+#### Effect of Cooling Down in Ice Water
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+((25.44-19.585) + (18.78-22.64) + (30.035-33.56) + (18.71-36.815))/4
+```
+
+The main effect of cooling the eggs in ice water is $$I = \frac{(25.44-19.585) + (18.78-22.64) + (30.035-33.56) + (18.71-36.815)}{4} =  -4.90875$$ 
+
+|     On average, cooling down the eggs in iced water for five minutes after boiling the eggs makes the peeling time shorter, and the time difference is approximately 4.91 seconds.
+
+#### Effect of Age of the Egg
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+((19.585-33.56) + (25.44-30.035) + (18.78-18.71) + (22.64-36.815))/4
+```
+
+The main effect of the age of the age is $$A = \frac{(19.585-33.56) + (25.44-30.035) + (18.78-18.71) + (22.64-36.815)}{4} =  -8.16875 $$
+
+On average, the peeling time of 1-week-old eggs are shorter than the peeling time of fresh eggs, and the time difference is approximately 8.17 seconds.
+
+### Interaction Effects
+
+#### Two Factors Interaction Between Vinegar and Age of Eggs
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+interaction.plot(raw_data$Vinegar,raw_data$Age,raw_data$Peeling_Time, type="l",
+                 xlab="Vinegar",trace.label="Age",
+                 ylab="Peeling Time")
+```
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+(18.710+36.815)/2 - (30.035+33.56)/2
+
+(22.640+18.780)/2 - (19.585+25.440)/2
+
+(-1.8025 - (-4.035))/2
+```
+When eggs are fresh the vinegar effect is: $$\frac{18.710+36.815}{2}- \frac{30.035+33.56}{2} = -4.035$$
+
+When eggs are a week old the vinegar effect is: $$\frac{22.640+18.780}{2}- \frac{19.585+25.440}{2} =  -1.8025$$
+
+The two factors interaction between vinegar and age of eggs is $$VA =  \frac{-1.8025 - (-4.035)}{2} = 1.11625$$
+
+|     Although the difference of peeling time with and without vinegar when the eggs are fresh and when the eggs are 1 week-old is similar, there is a slight difference according to the interaction plot. Specifically, when the egg is fresh, the influence of vinegar on the difference of the peeling time is larger.   
+
+#### Two Factor Interaction Between Vinegar and Cooling of Eggs
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+interaction.plot(raw_data$Vinegar,raw_data$Ice,raw_data$Peeling_Time, type="l",
+                 xlab="Vinegar",trace.label="Ice",
+                 ylab="Peeling Time")
+```
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+((22.640+36.815)/2) - ((19.585+33.560)/2)
+
+(18.710+18.780)/2 - (30.035+25.440)/2
+
+(-8.9925 - 3.155)/2
+```
+
+When eggs are not cooled in ice the vinegar effect is: $$\frac{22.640+36.815}{2}- \frac{19.585+33.560}{2} = 3.155$$
+
+When eggs are cooled in ice the vinegar effect is: $$\frac{18.710+18.780}{2}- \frac{30.035+25.440}{2} = -8.9925$$
+
+The two factors interaction between vinegar and cooling of eggs is: $$VI =  \frac{-8.9925 - 3.155}{2} = -6.07375$$
+
+|     There is a significant interaction between vinegar and the cooling of eggs. In particular, when the eggs are cooled down in iced water for 5 minutes after boiling, the peeling time is shorter when vinegar is added in the water while boiling the eggs. Conversely, when the eggs are cooled down in room temperature for 5 minuters after boiling, the peeling time is shorter when no vinegar is added in the water while boiling eggs.
+
+#### Two Factor Interaction Between Cooling of Eggs and Age of Eggs
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+interaction.plot(raw_data$Ice,raw_data$Age,raw_data$Peeling_Time, type="l",
+                 xlab="Ice",trace.label="Age",
+                 ylab="Peeling Time")
+```
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+((30.035 + 18.71)/2) - ((36.815 + 33.560)/2)
+
+(25.440+18.780)/2 - (19.585 + 22.640)/2
+
+(-10.815 - 0.9975)/2
+```
+
+When eggs are fresh the cooling effect is: $$\frac{30.035 + 18.710}{2}- \frac{36.815 + 33.560}{2} = -10.815$$
+
+When eggs are 1-week-old the cooling effect is: $$\frac{25.440 + 18.780}{2}- \frac{19.585 + 22.640}{2} = 0.9975$$
+
+The two factors interaction between cooling of the eggs and age of eggs is $$IA =  \frac{-10.815 - 0.9975}{2} = -5.90625$$
+
+|     It is evident that there is a two factors interaction between cooling and age of the eggs. When the egg is fresh, cooling the eggs in iced water for 5 minutes after boiling significantly decrease the peeling time. However, when the egg is 1-week-old, cooling the eggs in iced water for 5 minutes led to a slight increase in peeling time. 
+
+#### Three factor interactions
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+((18.710-30.035) - (36.815 - 33.560))/2
+
+((18.780-25.440) - (22.640 - 19.585))/2
+
+(-4.8575 - (-7.29))/2
+```
+
+When eggs are fresh the cooling effect is: $$\frac{(18.710-30.035) - (36.815 - 33.560)}{2} = -7.29$$
+
+When eggs are one-week-old the cooling effect is: $$\frac{(18.780-25.440) - (22.640 - 19.585)}{2} = -4.8575$$
+
+The three factors interaction is $$VIA =  \frac{-4.8575 - (-7.29)}{2} = 1.21625$$
+
+## Estimated Variance of the Effects
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+# create dataframe
+run1 <- c(5, 1, 7, 3, 13, 9, 15, 11)
+run2 <- c(6, 2, 8, 4, 14, 10, 16, 12)
+Vinegar <- c(-1, -1, 1, 1, -1, -1, 1, 1)
+Ice <- c(-1, 1, -1, 1, -1, 1, -1, 1)
+Age <- c(-1, -1, -1, -1, 1, 1, 1, 1)
+y1 <- c(36.20, 30.46, 45.23, 23.62, 17.26, 24.45, 22.92, 16.66)
+y2 <- c(30.92, 29.61, 28.40, 13.80, 21.91, 26.43, 22.36, 20.90)
+
+diff <- 0
+for(i in 1:8){
+  diff[i] <- y1[i] - y2[i]
+}
+
+diff_data <- data.frame(run1, run2, Vinegar, Ice, Age, y1, y2, diff)
+
+table2 = cbind(run1, run2, Vinegar, Ice, Age, y1, y2, diff)
+table2
+```
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+# si and s
+
+si_2 <- 0
+
+for(i in 1:8){
+  si_2[i] <- ((diff[i])^2)/2
+}
+
+sum(si_2)
+s_2 <- sum(si_2)/8
+s_2
+```
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+# var(effect)
+var_effect <- (1/8 + 1/8) * s_2
+var_effect
+sqrt(var_effect)
+```
+
+The estimated variance at each set of condition is $s_i^2 = \frac{(y_{i1} - y_{i2})^2} {2}$.
+
+A pooled estimate of $\sigma^2$ is $$s^2 = \frac{\sum\limits_{i=1}^8 s_i^2}{8} = \frac{226.0581}{8} = 28.25727$$
+
+The variance of the error variance of the effects from replicated runs can be derived using $s^2$ is $$Var(effect) = (\frac{1}{8} + \frac{1}{8}) s^2 = \frac{28.25727}{4} = 7.064317$$
+
+Also, the standard error of any factorial effect is $$se(effect) = \sqrt{7.064317} =  2.657878$$
+
+## Confidence Intervals for True Values of Effects
+
+Assuming that the observations are independent and normally distributed, then $$effect/se(effect) \sim t_8 $$
+
+And 95 % confidence intervals of the effect is $$effect \pm t_{8, .05/2}\times se(effect)$$
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+qt(p = 1-.025,df = 8)
+```
+
+Here, $t_{8, .05/2} = 2.3$
+
+### 95% Confidence Interval for the Factorial Effect:
+
+V: $-4.90875 \pm 2.3 \times 2.66 = (-9.037, 3.199)$
+
+I: $-4.90875 \pm 2.3 \times 2.66 = (-11.027, 1.209)$
+
+A: $-8.16875\pm 2.3 \times 2.66 = (-14.287, -2.051)$
+
+VA: $1.11625\pm 2.3 \times 2.66 = (-5.002, 7.234)$
+
+VI: $-6.07375 \pm 2.3 \times 2.66 = (-12.192, 0.044)$
+
+IA: $-5.90625 \pm 2.3 \times 2.66 = (-12.024, 0.212)$
+
+VIA: $1.21625 \pm 2.3 \times 2.66 = (-4.901, 7.334)$
+
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+
+# V
+-2.91875 + 2.3 * 2.66
+-2.91875 - 2.3 * 2.66
+
+# I
+
+-4.90875 + 2.3 * 2.66
+-4.90875 - 2.3 * 2.66
+# A
+-8.16875 + 2.3 * 2.66
+-8.16875 - 2.3 * 2.66
+
+# VA
+1.11625 + 2.3 * 2.66
+1.11625 - 2.3 * 2.66
+
+# VI
+-6.07375 + 2.3 * 2.66
+-6.07375 - 2.3 * 2.66
+
+# IA
+-5.90625 + 2.3 * 2.66
+-5.90625 - 2.3 * 2.66
+
+# VIA
+1.21625 + 2.3 * 2.66
+1.21625 - 2.3 * 2.66
+```
+
+## Interpretation of Results
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+# V
+-2.91875/2.657878
+
+# I
+-4.90875/2.657878
+# A
+-8.16875/2.657878
+# VA
+1.11625/2.657878
+# VI
+-6.07375/2.657878
+# IA
+-5.90625/2.657878
+# VIA
+1.21625/2.657878
+```
+
+|     According to the textbook, any effect that is 2-3 times their standard error are not easily explained by chance alone. Examining the main effects, we found that:
+
+(1) Main effect V: $\frac {-2.91875}{2.657878} = -1.09815$
+
+(2) Main effect I: $\frac {-4.90875}{2.657878} = -1.846868$
+
+(3) Main effect A: $\frac {-8.16875}{2.657878} = -3.07341$
+
+(4) Two way interaction effect VA: $\frac {1.11625}{2.657878} =  0.4199779$
+
+(5) Two way interaction effect VI: $\frac {-6.07375}{2.657878} = -2.285188$
+
+(6) Two way interaction effect IA: $\frac {-5.90625}{2.657878} = -2.222167$
+
+(7) Three way interaction effect VIA: $\frac {1.21625}{2.657878} = 0.4576019$
+
+|     Out of the 3 main effects, only main effect A is 2-3 times their standard error. Thus, while the effect of age on the peeling time of the eggs are probably not due to chance, the remaining two effect, which is whether or not vinegar is added when boiling and whether or not eggs are cooled in iced water, could possibly be explained by chance. Since 2 of the main effects are not significant, interaction effects will not be included and discussed further on. 
+
+|     In fact, when linear model is fitted, it could also be observed that using a $\alpha = 0.05$ benchmark, only the p-value for age is lesser than 0.05, which indicates that only the main effect A is significant. 
+
+## Linear Model & Hypothesis Testing
+
+Let $y_i$ be the peeling time from the $i^{th}$ run, fit a linear model for the $2^3$ factorial design for hypothesis testing: $$ y_i = \beta_0 + \beta_1x_{i1} +  \beta_2x_{i2} +  \beta_3x_{i3} +  \beta_4x_{i1}x_{i2} + \beta_5x_{i1}x_{i3} + \beta_6x_{i2}x_{i3} + \beta_7x_{i1}x_{i2}x_{i3}$$ 
+
+Where $x_{i1} = 1$ if vinegar is added and $x_{i1} = -1$ if vinegar is not added when boiling, $x_{i2} = 1$ if the eggs are cooled down with iced water and $x_{i2} = -1$ if the eggs are not cooled down with iced water, and $x_{i3} = 1$ if eggs are a week-old and $x_{i3} = -1$ if the eggs are fresh. 
+
+In addition, $x_{i1}x_{i2}$ is the interaction between vinegar and cooling, $x_{i1}x_{i3}$ is the interaction between vinegar and age, $x_{i2}x_{i3}$ is the interaction between cooling and age, and $x_{i1}x_{i2}x_{i3}$ is the three way interaction between the three factors. 
+
+```{r, include = F, echo = FALSE, warning=FALSE, message=FALSE}
+
+run <- c(5, 1, 7, 3, 13, 9, 15, 11, 6, 2, 8, 4, 14, 10, 16, 12)
+Vinegar <- c(-1, -1, 1, 1, -1, -1, 1, 1,-1, -1, 1, 1, -1, -1, 1, 1)
+Ice <- c(-1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1)
+Age <- c(-1, -1, -1, -1, 1, 1, 1, 1, -1, -1, -1, -1, 1, 1, 1, 1)
+y <- c(36.20, 30.46, 45.23, 23.62, 17.26, 24.45, 22.92, 16.66, 30.92, 29.61, 28.40, 13.80, 21.91, 26.43, 22.36, 20.90)
+lm_data <- data.frame(run, Vinegar, Ice, Age, y)
+```
+
+```{r, include = T, echo = FALSE, warning=FALSE, message=FALSE}
+# do i need this?
+lmmod <- lm(y ~ Vinegar*Ice*Age, data=lm_data)
+round(summary(lmmod)$coefficients,2)
+```
+
+# III. Conclusions
+
+|     This factorial experiment examines three factors' effect on the time needed for peeling the eggs and potential interaction effects between the three main effect. The main effect of vinegar is -2.91875, the main effect of ice is -4.90875, and the main effect of age is -8.16875. With the 3 main effects, only the main effect age is significant. Thus, it could be concluded that when the eggs are one week old, they would be easier to peel than the eggs that are fresh ($p = 0.02$). However, there is no evidence ($p = 0.3$) to conclude that adding vinegar to the water when boiling the eggs makes the eggs easier to peel. Similarly, there is no evidence ($p = 0.1$) to conclude that cooling the eggs in iced water makes the eggs easier to peel compared to cooling the eggs in room temperature. Further, possibilities for significant 2 factors and 3 factors interactional effects are ruled out, as only one main effect is significant.
+
+|     Among the 8 conditions (3 factors $\times$ 2 levels), the optimal condition is when vinegar is added while boiling, when eggs are cooled with iced water after boiling, and when the eggs are fresh (($V, I, A$) = ($1, 1, -1$)), with the average peeling time equal to 18.71. A condition having similar peeling time (18.78 sec) is when vinegar is added, when eggs are cooled with iced water after boiling, and when eggs are one week old (($V, I, A$) = ($1, 1, 1$)). Since the time difference between the two conditions are small, the results generally supported my hypothesis prior the experiment that when ($V, I, A$) = ($1, 1, 1$), the time required for peeling the eggs will be the shortest. Further, the eggs that take the most time to peel is when vinegar is added, when cooled in room temperature, and when the eggs are fresh (($V, I, A$) = ($1, -1, -1$)). 
+
+# IV. Discussions and Limitations
+
+|     By investigating both the standard error of the effects and the p-value of the hypothesis testing for the linear model, only the main effect age is significant, which is unexpected and abnormal. By close inspection, I think that this might be due to the fact that the standard error of the effects are too large since the number of replication runs are not enough. Further, since different people might have different peeling styles, it might be that for people with different peeling styles, the conditions affect the peeling time differently. In other words, individuals' peeling style mediates the relationship between the factors and the outcomes. Thus, future experiments could possibly increase the number of replication runs to possily lower the standard error. To lower the influence of peeling style, the experiment could ask more people to peel the eggs and take the average of different people's peeling time under the same experimental condition. 
+
+|     Compared to the initial proposal made before the experiment, I have made two changes in the actual experiment. First, I mentioned that I am going to put 8 eggs in the fridge for a week and then cook them. However, since the eggs bought in the supermarket are not in the fridge, I think that it is better to keep it in room temperature to eliminate potential biases. Further, in the proposal, I stated that I will put 4 eggs into iced water that contains 20 ice cubes. However, the ice cubes melt too quickly and I decided to add 20 extra ice cubes. I made a mistake in this step in that since I did not have thermometer, I did not measure the temperature of the water of both conditions. While this would not influence the results, knowing the temperature of the water is still important to make sure the experiment is replicable.  
+
+|     I would also want to mention that a potential source of bias is that when the eggs are cooled in room temperature for 5 minutes after boiling, the eggs are still hot. When I was peeling the eggs, I had to either speed up or take small rests, which might be a potential bias. Thus, future experiment could either cool down the eggs for a longer period of time or put on gloves to avoid the pain. 
+
+|     Finally, in addition to the three factors included in this experiment, there are many other factors online that are said to influence the peeling time of eggs, such as the boiling time of eggs, cooling time of eggs after boiling, and whether the eggs are put into the fridge before boiling. While I only choose three factors to avoid over-complicating my experiment, future experiments could also study other factors to investigate whether the facts claimed online are true or not and to find out the conditions that make peeling eggs the fastest.
+
